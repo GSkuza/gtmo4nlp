@@ -8,18 +8,8 @@ Adaptive Observation System: Multiple geometric lenses for semantic interpretati
 SANB-5 Logic: 5-valued logic system (O, Z, Ø, ∞, Ψ) for handling topological paradoxes
 Topological Knowledge Attractors: Dynamic classification in phase space
 
-📁 Repository Structure
-gtmo/
-├── gtmo_core_v1.py           # Core framework v3.0 - synthesis of configurational and adaptive approaches
-├── gtmo_axioms_v1.py           # Enhanced GTMØ axioms with executable implementations
-├── topology_v1_optimized.py    # Topological analysis and visualization module
-├── gtmo_sanb5_logic.py         # SANB-5 logic implementation
-├── docs/
-│   ├── Logic_of_Fiction.pdf               # Academic paper on fiction logic
-│   └── Language_Mathematics_Relation.pdf  # Foundational theory paper
-└── README.md
 🚀 Quick Start
-pythonfrom gtmo_core_ver3 import UnifiedGTMOSystem, Configuration, AlienatedNumber
+pythonfrom gtmo_core_v1 import UnifiedGTMOSystem, Configuration, AlienatedNumber
 
 # Create GTMØ system
 system = UnifiedGTMOSystem()

@@ -1,5 +1,6 @@
 Overview
-GTMØ (Geometry Topology Mathematics Øndefiniteness) is a groundbreaking mathematical framework that formalizes the indefinable aspects of language and meaning through geometric and topological structures. This repository contains the Python implementation of GTMØ theory, which bridges mathematics, linguistics, and cognitive science.
+GTMØ (Geometry Topology Mathematics Øndefiniteness) is a mathematical framework that formalizes the indefinable aspects of language and meaning through geometric and topological structures. This repository contains the Python implementation of GTMØ theory, which bridges mathematics, linguistics, and cognitive science.
+
 🌟 Key Features
 
 AlienatedNumbers: Mathematical objects capturing indefinite aspects through geometric configuration

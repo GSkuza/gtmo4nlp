@@ -220,6 +220,45 @@ PHI = (1 + np.sqrt(5)) / 2  # Golden ratio
 SQRT_2_INV = 1 / np.sqrt(2)  # Quantum amplitude
 COGNITIVE_CENTER = np.array([0.5, 0.5, 0.5])  # Neutral knowledge state
 
+# ============================================================================
+# GTMØ WSPÓŁRZĘDNE DLA CECH MORFOLOGICZNYCH
+# ============================================================================
+
+# Aspekt czasownika (determination, stability, entropy)
+ASPECT_COORDS = {
+    'perf': (0.8, 0.7, 0.2),    # Dokonany = określony, zakończony
+    'imperf': (0.5, 0.5, 0.5)   # Niedokonany = trwały, niezakończony
+}
+
+# Czas czasownika
+TENSE_COORDS = {
+    'past': (0.7, 0.8, 0.2),    # Przeszły = stabilny, określony
+    'pres': (0.6, 0.5, 0.4),    # Teraźniejszy = mniej stabilny
+    'fut': (0.4, 0.3, 0.6)      # Przyszły = niepewny, wysoka entropia
+}
+
+# Liczba gramatyczna
+NUMBER_COORDS = {
+    'sg': (0.7, 0.7, 0.3),      # Pojedyncza = bardziej określona
+    'pl': (0.5, 0.5, 0.5)       # Mnoga = bardziej ogólna
+}
+
+# Rodzaj gramatyczny
+GENDER_COORDS = {
+    'm1': (0.8, 0.7, 0.3),      # Męskoosobowy = określony
+    'm2': (0.7, 0.6, 0.4),      # Męski żywotny
+    'm3': (0.6, 0.6, 0.4),      # Męski nieżywotny
+    'f': (0.7, 0.7, 0.3),       # Żeński = określony
+    'n': (0.6, 0.5, 0.5)        # Nijaki = mniej określony
+}
+
+# Stopień przymiotnika
+DEGREE_COORDS = {
+    'pos': (0.6, 0.7, 0.3),     # Równy = normalny stopień
+    'com': (0.5, 0.5, 0.5),     # Wyższy = porównawczy
+    'sup': (0.8, 0.6, 0.4)      # Najwyższy = najbardziej określony
+}
+
 @dataclass
 class GTMOCoordinates:
     """Współrzędne GTMØ w przestrzeni fazowej 3D."""
@@ -432,6 +471,155 @@ class MorfeuszAnalyzer:
         # Domyślnie rzeczownik
         else:
             return 'subst:sg:nom:m3'
+
+    def _detect_gender(self, word: str, tag: str) -> str:
+        """Rozpoznaj rodzaj gramatyczny słowa (m1/m2/m3/f/n)."""
+        word_lower = word.lower()
+
+        # m1 (męskoosobowy) - osoby płci męskiej
+        m1_endings = ['ek', 'ik', 'arz', 'cz', 'nik', 'ak', 'ec']
+        m1_words = ['człowiek', 'mężczyzna', 'chłopiec', 'ojciec', 'syn', 'brat',
+                    'dziadek', 'wuj', 'kuzyn', 'kolega', 'przyjaciel', 'nauczyciel']
+
+        if word_lower in m1_words:
+            return 'm1'
+        for ending in m1_endings:
+            if word_lower.endswith(ending) and len(word_lower) > len(ending) + 2:
+                # Heurystyka: jeśli ma typową końcówkę męskoosobową
+                return 'm1'
+
+        # f (żeński)
+        f_endings = ['a', 'ka', 'ia', 'ość', 'ość', 'ja', 'ni', 'yni', 'owa', 'wa']
+        f_words = ['kobieta', 'matka', 'córka', 'siostra', 'babcia', 'ciocia']
+
+        if word_lower in f_words:
+            return 'f'
+        for ending in f_endings:
+            if word_lower.endswith(ending):
+                return 'f'
+
+        # n (nijaki)
+        n_endings = ['o', 'um', 'ę', 'cie', 'nie', 'dło', 'tko']
+        n_words = ['dziecko', 'pole', 'morze', 'okno', 'miasto']
+
+        if word_lower in n_words:
+            return 'n'
+        for ending in n_endings:
+            if word_lower.endswith(ending):
+                return 'n'
+
+        # m2 (męski żywotny) - zwierzęta
+        m2_words = ['pies', 'kot', 'koń', 'ptak', 'słoń', 'lew', 'wilk']
+        if word_lower in m2_words:
+            return 'm2'
+
+        # m3 (męski nieżywotny) - rzeczy, domyślny dla rzeczowników męskich
+        return 'm3'
+
+    def _detect_number(self, word: str) -> str:
+        """Rozpoznaj liczbę gramatyczną (sg/pl)."""
+        word_lower = word.lower()
+
+        # Liczba mnoga - końcówki
+        pl_endings = [
+            'y', 'i',           # nom.pl: domy, konie
+            'ów', 'i',          # gen.pl: domów, koni
+            'om',               # dat.pl: domom
+            'ami', 'mi',        # inst.pl: domami
+            'ach',              # loc.pl: domach
+        ]
+
+        # Wyjątki liczby mnogiej
+        pl_words = ['ludzie', 'dzieci', 'oczy', 'ręce', 'nogi']
+        if word_lower in pl_words:
+            return 'pl'
+
+        # Sprawdź końcówki liczby mnogiej
+        for ending in pl_endings:
+            if word_lower.endswith(ending) and len(word_lower) > len(ending) + 2:
+                # Dodatkowa heurystyka: unikaj fałszywych trafień dla krótkich słów
+                if ending in ['y', 'i'] and len(word_lower) > 3:
+                    return 'pl'
+                elif ending not in ['y', 'i']:
+                    return 'pl'
+
+        # Domyślnie liczba pojedyncza
+        return 'sg'
+
+    def _detect_verb_aspect(self, lemma: str) -> str:
+        """Rozpoznaj aspekt czasownika (perf/imperf)."""
+        lemma_lower = lemma.lower()
+
+        # Prefiksy dokonane (perfektywne)
+        perfective_prefixes = [
+            'z', 'wy', 'prze', 'roz', 'po', 'na', 'u', 's', 'do',
+            'od', 'przy', 'we', 'za', 'ob'
+        ]
+
+        for prefix in perfective_prefixes:
+            if lemma_lower.startswith(prefix) and len(lemma_lower) > len(prefix) + 2:
+                # Sprawdź czy to faktycznie prefiks a nie część rdzenia
+                if lemma_lower.startswith(prefix + 'r') or lemma_lower.startswith(prefix + 'p'):
+                    return 'perf'
+
+        # Sufiksy niedokonane (imperfektywne)
+        imperfective_suffixes = ['ywać', 'iwać', 'ować']
+        for suffix in imperfective_suffixes:
+            if lemma_lower.endswith(suffix):
+                return 'imperf'
+
+        # Typowe czasowniki dokonane i niedokonane (słownik)
+        perfective_verbs = ['zrobić', 'powiedzieć', 'wziąć', 'dać', 'kupić', 'sprzedać']
+        imperfective_verbs = ['robić', 'mówić', 'brać', 'dawać', 'kupować', 'sprzedawać']
+
+        if lemma_lower in perfective_verbs:
+            return 'perf'
+        elif lemma_lower in imperfective_verbs:
+            return 'imperf'
+
+        # Domyślnie niedokonany
+        return 'imperf'
+
+    def _detect_verb_tense(self, word: str) -> str:
+        """Rozpoznaj czas czasownika (pres/past/fut)."""
+        word_lower = word.lower()
+
+        # Czas przeszły - końcówki
+        past_endings = ['łem', 'łeś', 'ł', 'ła', 'ło', 'liśmy', 'łyśmy', 'li', 'ły']
+        for ending in past_endings:
+            if word_lower.endswith(ending):
+                return 'past'
+
+        # Czas przyszły - formy analityczne z 'będę'
+        future_forms = ['będę', 'będziesz', 'będzie', 'będziemy', 'będziecie', 'będą']
+        if word_lower in future_forms:
+            return 'fut'
+
+        # Czas teraźniejszy - końcówki (domyślny)
+        present_endings = ['ę', 'esz', 'e', 'emy', 'ecie', 'ą', 'am', 'asz', 'amy', 'acie', 'ają']
+        for ending in present_endings:
+            if word_lower.endswith(ending):
+                return 'pres'
+
+        # Domyślnie teraźniejszy
+        return 'pres'
+
+    def _detect_adj_degree(self, word: str) -> str:
+        """Rozpoznaj stopień przymiotnika (pos/com/sup)."""
+        word_lower = word.lower()
+
+        # Stopień najwyższy - prefiks 'naj-'
+        if word_lower.startswith('naj'):
+            return 'sup'
+
+        # Stopień wyższy - końcówki
+        comparative_endings = ['szy', 'ejszy', 'iejszy']
+        for ending in comparative_endings:
+            if word_lower.endswith(ending):
+                return 'com'
+
+        # Stopień równy (domyślny)
+        return 'pos'
 
 class SpacyAnalyzer:
     """spaCy analyzer for Polish syntactic analysis with fallback."""
@@ -701,16 +889,19 @@ class GTMOProcessor:
         return coords, config, metadata
 
     def _process_morphology(self, morfeusz_analysis: List[Dict], metadata: Dict) -> GTMOCoordinates:
-        """Przetwarzanie cech morfologicznych."""
+        """Przetwarzanie cech morfologicznych z rozszerzoną analizą."""
         coords_list = []
 
         for analysis in morfeusz_analysis:
             tag_parts = analysis.get('tag', '').split(':')
+            tag = analysis.get('tag', '')
+            form = analysis.get('form', '')
+            lemma = analysis.get('lemma', '')
 
-            # Wyciągnij przypadek
-            for tag in tag_parts:
-                if tag in self.case_map:
-                    case = self.case_map[tag]
+            # ISTNIEJĄCE: Wyciągnij przypadek
+            for tag_part in tag_parts:
+                if tag_part in self.case_map:
+                    case = self.case_map[tag_part]
                     coords_list.append(case.coords.to_array())
                     metadata['analyses'].append({
                         'type': 'case',
@@ -718,6 +909,60 @@ class GTMOProcessor:
                         'source': analysis.get('source', 'morfeusz2' if self.morfeusz.available else 'fallback')
                     })
                     break
+
+            # NOWE: Wykryj i dodaj rodzaj gramatyczny
+            if 'subst' in tag or 'adj' in tag:
+                gender = self.morfeusz._detect_gender(form, tag)
+                if gender in GENDER_COORDS:
+                    coords_list.append(np.array(GENDER_COORDS[gender]))
+                    metadata['morphological_features'].append({
+                        'type': 'gender',
+                        'value': gender,
+                        'form': form
+                    })
+
+            # NOWE: Wykryj i dodaj liczbę
+            number = self.morfeusz._detect_number(form)
+            if number in NUMBER_COORDS:
+                coords_list.append(np.array(NUMBER_COORDS[number]))
+                metadata['morphological_features'].append({
+                    'type': 'number',
+                    'value': number,
+                    'form': form
+                })
+
+            # NOWE: Dla czasowników - aspekt i czas
+            if 'verb' in tag:
+                # Aspekt
+                aspect = self.morfeusz._detect_verb_aspect(lemma)
+                if aspect in ASPECT_COORDS:
+                    coords_list.append(np.array(ASPECT_COORDS[aspect]))
+                    metadata['morphological_features'].append({
+                        'type': 'aspect',
+                        'value': aspect,
+                        'lemma': lemma
+                    })
+
+                # Czas
+                tense = self.morfeusz._detect_verb_tense(form)
+                if tense in TENSE_COORDS:
+                    coords_list.append(np.array(TENSE_COORDS[tense]))
+                    metadata['morphological_features'].append({
+                        'type': 'tense',
+                        'value': tense,
+                        'form': form
+                    })
+
+            # NOWE: Dla przymiotników - stopień
+            if 'adj' in tag:
+                degree = self.morfeusz._detect_adj_degree(form)
+                if degree in DEGREE_COORDS:
+                    coords_list.append(np.array(DEGREE_COORDS[degree]))
+                    metadata['morphological_features'].append({
+                        'type': 'degree',
+                        'value': degree,
+                        'form': form
+                    })
 
         if coords_list:
             return GTMOCoordinates(*np.mean(coords_list, axis=0))

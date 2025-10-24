@@ -1,0 +1,230 @@
+{
+  "być": {
+    "lemma": "być",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "jestem",
+        "2sg": "jesteś",
+        "3sg": "jest",
+        "1pl": "jesteśmy",
+        "2pl": "jesteście",
+        "3pl": "są"
+      },
+      "past": {
+        "1sg_m": "byłem",
+        "1sg_f": "byłam",
+        "2sg_m": "byłeś",
+        "2sg_f": "byłaś",
+        "3sg_m": "był",
+        "3sg_f": "była",
+        "3sg_n": "było",
+        "1pl_m": "byliśmy",
+        "1pl_f": "byłyśmy",
+        "2pl_m": "byliście",
+        "2pl_f": "byłyście",
+        "3pl_m": "byli",
+        "3pl_f": "były"
+      },
+      "future": {
+        "1sg": "będę",
+        "2sg": "będziesz",
+        "3sg": "będzie",
+        "1pl": "będziemy",
+        "2pl": "będziecie",
+        "3pl": "będą"
+      },
+      "imperative": {
+        "2sg": "bądź",
+        "1pl": "bądźmy",
+        "2pl": "bądźcie"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.9,
+      "stability": 0.85,
+      "entropy": 0.15
+    }
+  },
+  "mieć": {
+    "lemma": "mieć",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "mam",
+        "2sg": "masz",
+        "3sg": "ma",
+        "1pl": "mamy",
+        "2pl": "macie",
+        "3pl": "mają"
+      },
+      "past": {
+        "1sg_m": "miałem",
+        "1sg_f": "miałam",
+        "2sg_m": "miałeś",
+        "2sg_f": "miałaś",
+        "3sg_m": "miał",
+        "3sg_f": "miała",
+        "3sg_n": "miało",
+        "1pl_m": "mieliśmy",
+        "1pl_f": "miałyśmy",
+        "2pl_m": "mieliście",
+        "2pl_f": "miałyście",
+        "3pl_m": "mieli",
+        "3pl_f": "miały"
+      },
+      "future": {
+        "1sg": "będę miał",
+        "2sg": "będziesz miał",
+        "3sg": "będzie miał",
+        "1pl": "będziemy mieli",
+        "2pl": "będziecie mieli",
+        "3pl": "będą mieli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.8,
+      "stability": 0.75,
+      "entropy": 0.25
+    }
+  },
+  "wiedzieć": {
+    "lemma": "wiedzieć",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "wiem",
+        "2sg": "wiesz",
+        "3sg": "wie",
+        "1pl": "wiemy",
+        "2pl": "wiecie",
+        "3pl": "wiedzą"
+      },
+      "past": {
+        "1sg_m": "wiedziałem",
+        "2sg_m": "wiedziałeś",
+        "3sg_m": "wiedział",
+        "3sg_f": "wiedziała",
+        "3pl_m": "wiedzieli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.85,
+      "stability": 0.8,
+      "entropy": 0.2
+    }
+  },
+  "móc": {
+    "lemma": "móc",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "mogę",
+        "2sg": "możesz",
+        "3sg": "może",
+        "1pl": "możemy",
+        "2pl": "możecie",
+        "3pl": "mogą"
+      },
+      "past": {
+        "1sg_m": "mogłem",
+        "1sg_f": "mogłam",
+        "2sg_m": "mogłeś",
+        "3sg_m": "mógł",
+        "3sg_f": "mogła",
+        "3pl_m": "mogli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.6,
+      "stability": 0.5,
+      "entropy": 0.5
+    }
+  },
+  "chcieć": {
+    "lemma": "chcieć",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "chcę",
+        "2sg": "chcesz",
+        "3sg": "chce",
+        "1pl": "chcemy",
+        "2pl": "chcecie",
+        "3pl": "chcą"
+      },
+      "past": {
+        "1sg_m": "chciałem",
+        "2sg_m": "chciałeś",
+        "3sg_m": "chciał",
+        "3sg_f": "chciała",
+        "3pl_m": "chcieli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.7,
+      "stability": 0.6,
+      "entropy": 0.4
+    }
+  },
+  "iść": {
+    "lemma": "iść",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "idę",
+        "2sg": "idziesz",
+        "3sg": "idzie",
+        "1pl": "idziemy",
+        "2pl": "idziecie",
+        "3pl": "idą"
+      },
+      "past": {
+        "1sg_m": "szedłem",
+        "1sg_f": "szłam",
+        "2sg_m": "szedłeś",
+        "3sg_m": "szedł",
+        "3sg_f": "szła",
+        "3pl_m": "szli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.75,
+      "stability": 0.7,
+      "entropy": 0.3
+    }
+  },
+  "jeść": {
+    "lemma": "jeść",
+    "type": "irregular_verb",
+    "aspect": "imperf",
+    "forms": {
+      "present": {
+        "1sg": "jem",
+        "2sg": "jesz",
+        "3sg": "je",
+        "1pl": "jemy",
+        "2pl": "jecie",
+        "3pl": "jedzą"
+      },
+      "past": {
+        "1sg_m": "jadłem",
+        "2sg_m": "jadłeś",
+        "3sg_m": "jadł",
+        "3sg_f": "jadła",
+        "3pl_m": "jedli"
+      }
+    },
+    "gtmo_coords": {
+      "determination": 0.8,
+      "stability": 0.75,
+      "entropy": 0.25
+    }
+  }
+}

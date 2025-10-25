@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Helper do importowania GTMOProcessor z pliku ze spacjami w nazwie.
+Helper do importowania GTMOProcessor i modułów GTMØ.
 
 Użycie:
+    # Import procesora morfologicznego
     from Polish_Language_Processing.gtmo_processor_import import get_gtmo_processor
     processor = get_gtmo_processor()
+
+    # Import modułów dynamiki
+    from Polish_Language_Processing.gtmo_processor_import import get_hamiltonian
+    hamiltonian = get_hamiltonian()
+
+    # Lub import wszystkich klas dynamiki
+    from Polish_Language_Processing.gtmo_processor_import import get_gtmo_dynamics
+    dynamics = get_gtmo_dynamics()
+    Hamiltonian = dynamics['SemanticHamiltonian']
 """
 
 import importlib.util
@@ -63,6 +73,50 @@ def get_gtmo_analyzer():
     spec.loader.exec_module(module)
 
     return module.GTMOAnalyzer()
+
+
+def get_gtmo_dynamics():
+    """
+    Importuje i zwraca moduł gtmo_dynamics z wszystkimi klasami.
+
+    Returns:
+        dict: Słownik z klasami dynamiki GTMØ
+            - 'SemanticHamiltonian': Klasa dynamiki hamiltonowskiej
+            - 'JuliaEmergence': Klasa analizy emergence przez zbiory Julii
+            - 'ContextualDynamicsProcessor': Procesor dynamiki kontekstowej
+            - 'DynamicsVisualizer': Narzędzia wizualizacji
+            - 'GTMOCoordinates': Klasa współrzędnych
+            - 'SemanticTrajectory': Klasa trajektorii
+    """
+    # Import bezpośredni (plik bez spacji w nazwie)
+    from . import gtmo_dynamics
+
+    return {
+        'SemanticHamiltonian': gtmo_dynamics.SemanticHamiltonian,
+        'JuliaEmergence': gtmo_dynamics.JuliaEmergence,
+        'ContextualDynamicsProcessor': gtmo_dynamics.ContextualDynamicsProcessor,
+        'DynamicsVisualizer': gtmo_dynamics.DynamicsVisualizer,
+        'GTMOCoordinates': gtmo_dynamics.GTMOCoordinates,
+        'SemanticTrajectory': gtmo_dynamics.SemanticTrajectory,
+    }
+
+
+def get_hamiltonian():
+    """Szybki dostęp do SemanticHamiltonian."""
+    from . import gtmo_dynamics
+    return gtmo_dynamics.SemanticHamiltonian()
+
+
+def get_julia_analyzer():
+    """Szybki dostęp do JuliaEmergence."""
+    from . import gtmo_dynamics
+    return gtmo_dynamics.JuliaEmergence()
+
+
+def get_contextual_processor():
+    """Szybki dostęp do ContextualDynamicsProcessor."""
+    from . import gtmo_dynamics
+    return gtmo_dynamics.ContextualDynamicsProcessor()
 
 
 if __name__ == "__main__":

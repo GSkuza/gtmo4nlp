@@ -339,6 +339,428 @@ class KnowledgeAttractor(Enum):
         self.coords = GTMOCoordinates(determination, stability, entropy)
 
 # ============================================================================
+# SŁOWNIK NIEREGULARNYCH FORM
+# ============================================================================
+
+class IrregularFormsDict:
+    """Słownik nieregularnych form czasowników polskich."""
+
+    def __init__(self):
+        """Inicjalizuj słownik z pliku JSON."""
+        self.irregular_verbs = {}
+        self.form_to_lemma = {}  # Mapowanie forma → lemma
+        self._load_irregular_verbs()
+
+    def _load_irregular_verbs(self):
+        """Wczytaj nieregularne czasowniki z pliku JSON."""
+        import json
+        import os
+
+        # Ścieżka do pliku JSON
+        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        json_path = os.path.join(data_dir, 'polish_irregular_verbs.json')
+
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                self.irregular_verbs = json.load(f)
+
+            # Zbuduj mapowanie forma → lemma
+            for lemma, data in self.irregular_verbs.items():
+                for tense, forms in data.get('forms', {}).items():
+                    for person, form in forms.items():
+                        # Obsługa form złożonych (np. "będę miał")
+                        main_form = form.split()[0] if ' ' in form else form
+                        self.form_to_lemma[main_form.lower()] = lemma
+
+            logger.info(f"✅ Wczytano {len(self.irregular_verbs)} nieregularnych czasowników")
+
+        except FileNotFoundError:
+            logger.warning(f"⚠️ Brak pliku {json_path} - słownik nieregularny niedostępny")
+        except Exception as e:
+            logger.warning(f"⚠️ Błąd wczytywania słownika: {e}")
+
+    def lookup(self, word: str) -> Optional[Dict[str, Any]]:
+        """
+        Sprawdź czy słowo jest nieregularną formą czasownika.
+
+        Returns:
+            Dict z lemma, aspect, gtmo_coords lub None
+        """
+        word_lower = word.lower()
+
+        if word_lower in self.form_to_lemma:
+            lemma = self.form_to_lemma[word_lower]
+            verb_data = self.irregular_verbs.get(lemma, {})
+
+            return {
+                'lemma': lemma,
+                'aspect': verb_data.get('aspect', 'imperf'),
+                'gtmo_coords': verb_data.get('gtmo_coords', {}),
+                'is_irregular': True,
+                'type': 'irregular_verb'
+            }
+
+        return None
+
+    def get_all_forms(self, lemma: str) -> Optional[Dict]:
+        """Pobierz wszystkie formy dla danego lematu."""
+        return self.irregular_verbs.get(lemma)
+
+# ============================================================================
+# ANALIZATOR DERYWACYJNY (Prefiksy/Sufiksy)
+# ============================================================================
+
+class DerivationalAnalyzer:
+    """Analizator derywacyjny dla języka polskiego (słowotwórstwo)."""
+
+    def __init__(self):
+        """Inicjalizuj analizator z danymi o afiksach."""
+        self.prefixes = {}
+        self.suffixes = {}
+        self._load_affixes()
+
+    def _load_affixes(self):
+        """Wczytaj prefiksy i sufiksy z pliku JSON."""
+        import json
+        import os
+
+        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        json_path = os.path.join(data_dir, 'polish_derivational_affixes.json')
+
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                self.prefixes = data.get('prefixes', {})
+                self.suffixes = data.get('suffixes', {})
+
+            logger.info(f"✅ Wczytano {len(self.prefixes)} prefiksów i {len(self.suffixes)} sufiksów")
+
+        except FileNotFoundError:
+            logger.warning(f"⚠️ Brak pliku {json_path} - analiza derywacyjna niedostępna")
+        except Exception as e:
+            logger.warning(f"⚠️ Błąd wczytywania afiksów: {e}")
+
+    def extract_prefix(self, word: str) -> Optional[Tuple[str, str, Dict]]:
+        """
+        Wyciągnij prefiks ze słowa.
+
+        Returns:
+            (prefix, stem, prefix_data) lub None
+        """
+        word_lower = word.lower()
+
+        # Sortuj prefiksy od najdłuższych do najkrótszych
+        sorted_prefixes = sorted(self.prefixes.keys(), key=len, reverse=True)
+
+        for prefix in sorted_prefixes:
+            if word_lower.startswith(prefix) and len(word_lower) > len(prefix) + 2:
+                stem = word_lower[len(prefix):]
+                prefix_data = self.prefixes[prefix]
+                return (prefix, stem, prefix_data)
+
+        return None
+
+    def extract_suffix(self, word: str) -> Optional[Tuple[str, str, Dict]]:
+        """
+        Wyciągnij sufiks ze słowa.
+
+        Returns:
+            (suffix, stem, suffix_data) lub None
+        """
+        word_lower = word.lower()
+
+        # Sortuj sufiksy od najdłuższych do najkrótszych
+        sorted_suffixes = sorted(self.suffixes.keys(), key=len, reverse=True)
+
+        for suffix in sorted_suffixes:
+            if word_lower.endswith(suffix) and len(word_lower) > len(suffix) + 2:
+                stem = word_lower[:-len(suffix)]
+                suffix_data = self.suffixes[suffix]
+                return (suffix, stem, suffix_data)
+
+        return None
+
+    def analyze_word(self, word: str) -> Dict[str, Any]:
+        """
+        Pełna analiza derywacyjna słowa.
+
+        Returns:
+            Dict z informacjami o prefiksie, sufiksie i wpływie na GTMØ
+        """
+        result = {
+            'word': word,
+            'has_prefix': False,
+            'has_suffix': False,
+            'prefix': None,
+            'suffix': None,
+            'stem': word,
+            'gtmo_modifications': {
+                'determination': 0.0,
+                'stability': 0.0,
+                'entropy': 0.0
+            }
+        }
+
+        # Analiza prefiksu
+        prefix_info = self.extract_prefix(word)
+        if prefix_info:
+            prefix, stem, prefix_data = prefix_info
+            result['has_prefix'] = True
+            result['prefix'] = {
+                'text': prefix,
+                'type': prefix_data.get('type'),
+                'examples': prefix_data.get('examples', [])
+            }
+            result['stem'] = stem
+
+            # Dodaj wpływ na GTMØ
+            gtmo_effect = prefix_data.get('gtmo_effect', {})
+            for coord, value in gtmo_effect.items():
+                result['gtmo_modifications'][coord] += value
+
+        # Analiza sufiksu
+        suffix_info = self.extract_suffix(word)
+        if suffix_info:
+            suffix, stem, suffix_data = suffix_info
+            result['has_suffix'] = True
+            result['suffix'] = {
+                'text': suffix,
+                'derives': suffix_data.get('derives'),
+                'from': suffix_data.get('from'),
+                'examples': suffix_data.get('examples', [])
+            }
+
+            # Jeśli nie było prefiksu, ustaw stem z sufiksu
+            if not result['has_prefix']:
+                result['stem'] = stem
+
+            # Dodaj wpływ na GTMØ
+            gtmo_effect = suffix_data.get('gtmo_effect', {})
+            for coord, value in gtmo_effect.items():
+                result['gtmo_modifications'][coord] += value
+
+        return result
+
+# ============================================================================
+# ANALIZATOR KOLOKACJI
+# ============================================================================
+
+class CollocationAnalyzer:
+    """Analizator kolokacji i idiomów w języku polskim."""
+
+    def __init__(self):
+        """Inicjalizuj analizator z danymi o kolokacjach."""
+        self.collocations = {}
+        self.all_patterns = []  # Lista wszystkich wzorców (dla szybkiego przeszukiwania)
+        self._load_collocations()
+
+    def _load_collocations(self):
+        """Wczytaj kolokacje z pliku JSON."""
+        import json
+        import os
+
+        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        json_path = os.path.join(data_dir, 'polish_collocations.json')
+
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                self.collocations = data
+
+            # Zbuduj płaską listę wszystkich wzorców
+            for category, patterns in data.items():
+                for pattern, info in patterns.items():
+                    self.all_patterns.append({
+                        'pattern': pattern,
+                        'category': category,
+                        'info': info
+                    })
+
+            logger.info(f"✅ Wczytano {len(self.all_patterns)} kolokacji")
+
+        except FileNotFoundError:
+            logger.warning(f"⚠️ Brak pliku {json_path} - analiza kolokacji niedostępna")
+        except Exception as e:
+            logger.warning(f"⚠️ Błąd wczytywania kolokacji: {e}")
+
+    def find_collocations(self, text: str) -> List[Dict[str, Any]]:
+        """
+        Znajdź kolokacje w tekście.
+
+        Returns:
+            Lista znalezionych kolokacji z informacjami
+        """
+        text_lower = text.lower()
+        found_collocations = []
+
+        for pattern_info in self.all_patterns:
+            pattern = pattern_info['pattern']
+
+            if pattern in text_lower:
+                found_collocations.append({
+                    'pattern': pattern,
+                    'category': pattern_info['category'],
+                    'type': pattern_info['info'].get('type'),
+                    'frequency': pattern_info['info'].get('frequency'),
+                    'gtmo_coords': pattern_info['info'].get('gtmo_coords', {}),
+                    'meaning': pattern_info['info'].get('meaning')  # Dla idiomów
+                })
+
+        return found_collocations
+
+    def calculate_collocation_effect(self, collocations: List[Dict]) -> Dict[str, float]:
+        """
+        Oblicz zagregowany wpływ kolokacji na współrzędne GTMØ.
+
+        Returns:
+            Dict z modyfikacjami współrzędnych
+        """
+        if not collocations:
+            return {'determination': 0.0, 'stability': 0.0, 'entropy': 0.0}
+
+        # Uśrednij wpływ wszystkich znalezionych kolokacji
+        total_det = sum(c['gtmo_coords'].get('determination', 0.5) for c in collocations)
+        total_stab = sum(c['gtmo_coords'].get('stability', 0.5) for c in collocations)
+        total_ent = sum(c['gtmo_coords'].get('entropy', 0.5) for c in collocations)
+
+        count = len(collocations)
+
+        return {
+            'determination': total_det / count,
+            'stability': total_stab / count,
+            'entropy': total_ent / count
+        }
+
+# ============================================================================
+# SEMANTIC EMBEDDING ANALYZER (Framework)
+# ============================================================================
+
+class SemanticEmbeddingAnalyzer:
+    """
+    Framework do analizy semantycznej z embeddings.
+
+    Obecnie używa słownika podobieństw, ale gotowy do rozszerzenia o:
+    - word2vec
+    - fastText
+    - BERT/transformers
+    """
+
+    def __init__(self, use_pretrained=False):
+        """
+        Inicjalizuj analizator.
+
+        Args:
+            use_pretrained: Czy używać pretrenowanych modeli (word2vec/fasttext)
+        """
+        self.use_pretrained = use_pretrained
+        self.model = None
+        self.semantic_clusters = {}
+        self.word_similarities = {}
+        self._load_semantic_data()
+
+        if use_pretrained:
+            self._try_load_pretrained()
+
+    def _load_semantic_data(self):
+        """Wczytaj podstawowe dane semantyczne ze słownika."""
+        import json
+        import os
+
+        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        json_path = os.path.join(data_dir, 'polish_semantic_similarities.json')
+
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                self.semantic_clusters = data.get('semantic_clusters', {})
+                self.word_similarities = data.get('word_similarities', {})
+
+            logger.info(f"✅ Wczytano {len(self.semantic_clusters)} klastrów semantycznych")
+
+        except FileNotFoundError:
+            logger.warning(f"⚠️ Brak pliku {json_path} - analiza semantyczna niedostępna")
+        except Exception as e:
+            logger.warning(f"⚠️ Błąd wczytywania danych semantycznych: {e}")
+
+    def _try_load_pretrained(self):
+        """Spróbuj załadować pretrenowany model (word2vec/fasttext)."""
+        try:
+            # Próba załadowania gensim
+            import gensim
+            logger.info("⚠️ Gensim dostępny - można załadować pretrenowane modele")
+            logger.info("   Dodaj model word2vec dla polskiego do data/word2vec_polish.bin")
+            # self.model = gensim.models.KeyedVectors.load_word2vec_format(...)
+        except ImportError:
+            logger.info("ℹ️ Gensim niedostępny - używam słownika podobieństw")
+
+    def find_semantic_cluster(self, word: str) -> Optional[Dict]:
+        """
+        Znajdź klaster semantyczny dla słowa.
+
+        Returns:
+            Dict z informacjami o klastrze i współrzędnych GTMØ
+        """
+        word_lower = word.lower()
+
+        for cluster_name, cluster_data in self.semantic_clusters.items():
+            if word_lower in cluster_data.get('words', []):
+                return {
+                    'cluster': cluster_name,
+                    'gtmo_coords': cluster_data.get('gtmo_coords', {}),
+                    'words': cluster_data.get('words', [])
+                }
+
+        return None
+
+    def get_similar_words(self, word: str, top_n=5) -> List[str]:
+        """
+        Pobierz podobne słowa.
+
+        Returns:
+            Lista podobnych słów
+        """
+        word_lower = word.lower()
+
+        # Jeśli dostępny pretrenowany model
+        if self.model is not None:
+            try:
+                similar = self.model.most_similar(word_lower, topn=top_n)
+                return [w[0] for w in similar]
+            except:
+                pass
+
+        # Fallback: użyj słownika
+        return self.word_similarities.get(word_lower, [])[:top_n]
+
+    def calculate_semantic_context(self, words: List[str]) -> Dict[str, float]:
+        """
+        Oblicz kontekst semantyczny na podstawie listy słów.
+
+        Returns:
+            Dict z zagregowanymi współrzędnymi GTMØ
+        """
+        cluster_coords = []
+
+        for word in words:
+            cluster = self.find_semantic_cluster(word)
+            if cluster:
+                cluster_coords.append(cluster['gtmo_coords'])
+
+        if not cluster_coords:
+            return {'determination': 0.5, 'stability': 0.5, 'entropy': 0.5}
+
+        # Uśrednij współrzędne
+        avg_det = sum(c.get('determination', 0.5) for c in cluster_coords) / len(cluster_coords)
+        avg_stab = sum(c.get('stability', 0.5) for c in cluster_coords) / len(cluster_coords)
+        avg_ent = sum(c.get('entropy', 0.5) for c in cluster_coords) / len(cluster_coords)
+
+        return {
+            'determination': avg_det,
+            'stability': avg_stab,
+            'entropy': avg_ent
+        }
+
+# ============================================================================
 # ANALIZATOR MORFOLOGICZNY Z FALLBACK
 # ============================================================================
 
@@ -361,6 +783,9 @@ class MorfeuszAnalyzer:
             self.morfeusz = None
             self.available = False
             logger.info("ℹ️ Morfeusz2 niedostępny - używam fallback")
+
+        # Inicjalizuj słownik nieregularnych form
+        self.irregular_dict = IrregularFormsDict()
 
     def analyze(self, text: str) -> List[Dict[str, Any]]:
         """Analiza morfologiczna z fallback."""
@@ -415,8 +840,13 @@ class MorfeuszAnalyzer:
         return results
 
     def _guess_lemma(self, word: str) -> str:
-        """Prosta heurystyka lematyzacji."""
+        """Prosta heurystyka lematyzacji z obsługą nieregularnych form."""
         word_lower = word.lower()
+
+        # NAJPIERW sprawdź słownik nieregularnych form
+        irregular = self.irregular_dict.lookup(word_lower)
+        if irregular:
+            return irregular['lemma']
 
         # Usuwanie prostych końcówek fleksyjnych
         if word_lower.endswith(('em', 'ie', 'ą', 'y', 'e')):
@@ -547,8 +977,13 @@ class MorfeuszAnalyzer:
         return 'sg'
 
     def _detect_verb_aspect(self, lemma: str) -> str:
-        """Rozpoznaj aspekt czasownika (perf/imperf)."""
+        """Rozpoznaj aspekt czasownika (perf/imperf) z obsługą słownika nieregularnych."""
         lemma_lower = lemma.lower()
+
+        # NAJPIERW sprawdź słownik nieregularnych form
+        irregular = self.irregular_dict.lookup(lemma_lower)
+        if irregular:
+            return irregular['aspect']
 
         # Prefiksy dokonane (perfektywne)
         perfective_prefixes = [
@@ -830,6 +1265,9 @@ class GTMOProcessor:
         self.morfeusz = MorfeuszAnalyzer()
         self.spacy = SpacyAnalyzer()
         self.stanza = StanzaAnalyzer() # Added Stanza initialization
+        self.derivational = DerivationalAnalyzer()  # Analiza derywacyjna
+        self.collocation = CollocationAnalyzer()  # Analiza kolokacji
+        self.semantic = SemanticEmbeddingAnalyzer(use_pretrained=False)  # Analiza semantyczna
         self._init_mappings()
         print("✅ Procesor GTMØ gotowy")
 
@@ -879,9 +1317,64 @@ class GTMOProcessor:
         )
 
         coords = GTMOCoordinates(*combined)
+
+        # NOWE: Analiza derywacyjna (wpływ prefiksów/sufiksów na GTMØ)
+        derivational_mods = {'determination': 0.0, 'stability': 0.0, 'entropy': 0.0}
+        metadata['derivational_features'] = []
+
+        for analysis in morfeusz_analysis:
+            word = analysis.get('form', '')
+            deriv_result = self.derivational.analyze_word(word)
+
+            if deriv_result['has_prefix'] or deriv_result['has_suffix']:
+                metadata['derivational_features'].append({
+                    'word': word,
+                    'prefix': deriv_result['prefix'],
+                    'suffix': deriv_result['suffix'],
+                    'stem': deriv_result['stem']
+                })
+
+                # Akumuluj modyfikacje GTMØ
+                for coord, value in deriv_result['gtmo_modifications'].items():
+                    derivational_mods[coord] += value
+
+        # Zastosuj modyfikacje derywacyjne (normalizuj przez liczbę słów)
+        if len(morfeusz_analysis) > 0:
+            coords.determination = np.clip(
+                coords.determination + derivational_mods['determination'] / len(morfeusz_analysis),
+                0, 1
+            )
+            coords.stability = np.clip(
+                coords.stability + derivational_mods['stability'] / len(morfeusz_analysis),
+                0, 1
+            )
+            coords.entropy = np.clip(
+                coords.entropy + derivational_mods['entropy'] / len(morfeusz_analysis),
+                0, 1
+            )
+
+        # NOWE: Analiza kolokacji (wpływ idiomów i frazeologizmów)
+        found_collocations = self.collocation.find_collocations(text)
+        metadata['collocations'] = found_collocations
+
+        if found_collocations:
+            coll_effect = self.collocation.calculate_collocation_effect(found_collocations)
+            # Kolokacje mają silny wpływ, więc używamy większej wagi
+            coords.determination = np.clip(
+                coords.determination * 0.6 + coll_effect['determination'] * 0.4,
+                0, 1
+            )
+            coords.stability = np.clip(
+                coords.stability * 0.6 + coll_effect['stability'] * 0.4,
+                0, 1
+            )
+            coords.entropy = np.clip(
+                coords.entropy * 0.6 + coll_effect['entropy'] * 0.4,
+                0, 1
+            )
+
         # config.position and config.scale set in _process_syntax
         config.time = datetime.now().timestamp()
-
 
         # Classify to nearest attractor
         metadata['attractor'] = self._find_nearest_attractor(coords)
@@ -1136,9 +1629,9 @@ class GTMOProcessor:
         return coords, config
 
     def _compute_semantics(self, text: str) -> GTMOCoordinates:
-        """Oblicz cechy semantyczne."""
-        # Simplified semantic analysis
+        """Oblicz cechy semantyczne z użyciem klastrów semantycznych."""
         text_lower = text.lower()
+        words = text_lower.split()
 
         determination = 0.5
         stability = 0.5
@@ -1156,21 +1649,29 @@ class GTMOProcessor:
             stability += 0.1
             determination += 0.05
 
-        # Simple sentiment check (very basic)
+        # NOWE: Użyj analizy semantycznej z embeddings/klastrów
+        semantic_context = self.semantic.calculate_semantic_context(words)
+
+        # Połącz podstawową analizę z kontekstem semantycznym (waga 0.4 dla semantyki)
+        determination = determination * 0.6 + semantic_context['determination'] * 0.4
+        stability = stability * 0.6 + semantic_context['stability'] * 0.4
+        entropy = entropy * 0.6 + semantic_context['entropy'] * 0.4
+
+        # Simple sentiment check (very basic) - jako dodatek
         positive_words = ['dobry', 'miły', 'szczęście', 'radość', 'piękny']
         negative_words = ['zły', 'smutny', 'ból', 'strach', 'śmierć']
 
         sentiment_score = 0
-        for word in text_lower.split():
+        for word in words:
             if word in positive_words:
                 sentiment_score += 1
             elif word in negative_words:
                 sentiment_score -= 1
 
         if sentiment_score > 0:
-            determination += 0.1 # Positive sentiment adds some clarity
+            determination += 0.05  # Positive sentiment adds some clarity
         elif sentiment_score < 0:
-            entropy += 0.1 # Negative sentiment might add complexity
+            entropy += 0.05  # Negative sentiment might add complexity
 
         # Clip to valid range
         coords = GTMOCoordinates(

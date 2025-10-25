@@ -1,0 +1,223 @@
+{
+  "prefixes": {
+    "nie": {
+      "type": "negation",
+      "examples": ["niezdolny", "niemożliwy", "niedobre"],
+      "gtmo_effect": {
+        "determination": -0.2,
+        "stability": -0.1,
+        "entropy": 0.3
+      }
+    },
+    "prze": {
+      "type": "transformation",
+      "examples": ["przerobić", "przekształcić", "przenieść"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": -0.1,
+        "entropy": 0.2
+      }
+    },
+    "do": {
+      "type": "completion",
+      "examples": ["dopełnić", "dokończyć", "dopowiedzieć"],
+      "gtmo_effect": {
+        "determination": 0.2,
+        "stability": 0.15,
+        "entropy": -0.1
+      }
+    },
+    "wy": {
+      "type": "extraction",
+      "examples": ["wyciągnąć", "wydobyć", "wyjść"],
+      "gtmo_effect": {
+        "determination": 0.15,
+        "stability": 0.1,
+        "entropy": 0.1
+      }
+    },
+    "roz": {
+      "type": "distribution",
+      "examples": ["rozłożyć", "rozrzucić", "rozproszyć"],
+      "gtmo_effect": {
+        "determination": -0.15,
+        "stability": -0.2,
+        "entropy": 0.3
+      }
+    },
+    "z": {
+      "type": "perfective",
+      "examples": ["zrobić", "zbudować", "zjeść"],
+      "gtmo_effect": {
+        "determination": 0.25,
+        "stability": 0.2,
+        "entropy": -0.15
+      }
+    },
+    "po": {
+      "type": "distribution_light",
+      "examples": ["podzielić", "porozdawać", "pouciekać"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.05,
+        "entropy": 0.15
+      }
+    },
+    "na": {
+      "type": "accumulation",
+      "examples": ["nagromadzić", "nazbierać", "napełnić"],
+      "gtmo_effect": {
+        "determination": 0.2,
+        "stability": 0.15,
+        "entropy": 0.0
+      }
+    },
+    "u": {
+      "type": "completion_result",
+      "examples": ["upiększyć", "utrwalić", "umocnić"],
+      "gtmo_effect": {
+        "determination": 0.15,
+        "stability": 0.2,
+        "entropy": -0.05
+      }
+    },
+    "od": {
+      "type": "separation",
+      "examples": ["odłączyć", "odjechać", "oderwać"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.0,
+        "entropy": 0.1
+      }
+    },
+    "za": {
+      "type": "excess",
+      "examples": ["zabłądzić", "zachorować", "zanieczyścić"],
+      "gtmo_effect": {
+        "determination": -0.1,
+        "stability": -0.15,
+        "entropy": 0.25
+      }
+    },
+    "bez": {
+      "type": "lack",
+      "examples": ["bezsilny", "bezdomny", "bezsensowny"],
+      "gtmo_effect": {
+        "determination": -0.25,
+        "stability": -0.2,
+        "entropy": 0.35
+      }
+    },
+    "anty": {
+      "type": "opposition",
+      "examples": ["antydemokratyczny", "antywirus", "antykoncepcja"],
+      "gtmo_effect": {
+        "determination": 0.0,
+        "stability": -0.1,
+        "entropy": 0.3
+      }
+    }
+  },
+  "suffixes": {
+    "ość": {
+      "derives": "noun",
+      "from": "adj",
+      "examples": ["piękność", "mądrość", "szybkość"],
+      "gtmo_effect": {
+        "determination": 0.15,
+        "stability": 0.2,
+        "entropy": -0.1
+      }
+    },
+    "enie": {
+      "derives": "noun",
+      "from": "verb",
+      "examples": ["czytanie", "pisanie", "myślenie"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.15,
+        "entropy": 0.0
+      }
+    },
+    "anie": {
+      "derives": "noun",
+      "from": "verb",
+      "examples": ["spanie", "pływanie", "latanie"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.15,
+        "entropy": 0.0
+      }
+    },
+    "nik": {
+      "derives": "noun",
+      "from": "verb",
+      "examples": ["pracownik", "pomocnik", "uczestnik"],
+      "gtmo_effect": {
+        "determination": 0.2,
+        "stability": 0.25,
+        "entropy": -0.1
+      }
+    },
+    "acz": {
+      "derives": "noun",
+      "from": "verb",
+      "examples": ["gracz", "pisarz", "malarz"],
+      "gtmo_effect": {
+        "determination": 0.25,
+        "stability": 0.3,
+        "entropy": -0.15
+      }
+    },
+    "ka": {
+      "derives": "noun",
+      "from": "noun",
+      "examples": ["studentka", "nauczycielka", "pisarka"],
+      "gtmo_effect": {
+        "determination": 0.15,
+        "stability": 0.2,
+        "entropy": 0.0
+      }
+    },
+    "ny": {
+      "derives": "adj",
+      "from": "noun",
+      "examples": ["wodny", "słoneczny", "domowy"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.15,
+        "entropy": 0.05
+      }
+    },
+    "ski": {
+      "derives": "adj",
+      "from": "noun",
+      "examples": ["polski", "warszawski", "morski"],
+      "gtmo_effect": {
+        "determination": 0.2,
+        "stability": 0.25,
+        "entropy": 0.0
+      }
+    },
+    "owy": {
+      "derives": "adj",
+      "from": "noun",
+      "examples": ["owocowy", "sportowy", "biurowy"],
+      "gtmo_effect": {
+        "determination": 0.15,
+        "stability": 0.2,
+        "entropy": 0.0
+      }
+    },
+    "liwy": {
+      "derives": "adj",
+      "from": "verb",
+      "examples": ["zmywalny", "palny", "jadalny"],
+      "gtmo_effect": {
+        "determination": 0.1,
+        "stability": 0.15,
+        "entropy": 0.1
+      }
+    }
+  }
+}

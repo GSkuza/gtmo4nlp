@@ -47,4 +47,5 @@ htmlcov/
 # GTMØ specific
 *.json
 !package.json
+!data/*.json
 *.html

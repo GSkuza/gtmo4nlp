@@ -1,0 +1,147 @@
+{
+  "verb_noun": {
+    "robić zakupy": {
+      "type": "verb_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.75, "entropy": 0.25}
+    },
+    "brać udział": {
+      "type": "verb_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "mieć rację": {
+      "type": "verb_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.7, "stability": 0.65, "entropy": 0.35}
+    },
+    "podejmować decyzję": {
+      "type": "verb_noun",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "zwracać uwagę": {
+      "type": "verb_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.75, "entropy": 0.25}
+    },
+    "dawać radę": {
+      "type": "verb_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.7, "stability": 0.65, "entropy": 0.35}
+    },
+    "stawiać czoła": {
+      "type": "verb_noun",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "tracić głowę": {
+      "type": "verb_noun_idiom",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.4, "stability": 0.3, "entropy": 0.7}
+    }
+  },
+  "adj_noun": {
+    "dobra wola": {
+      "type": "adj_noun",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.7, "stability": 0.75, "entropy": 0.25}
+    },
+    "ciężka praca": {
+      "type": "adj_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.8, "entropy": 0.2}
+    },
+    "głęboka woda": {
+      "type": "adj_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.85, "stability": 0.85, "entropy": 0.15}
+    },
+    "szybka decyzja": {
+      "type": "adj_noun",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "wielka radość": {
+      "type": "adj_noun",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.7, "stability": 0.65, "entropy": 0.35}
+    }
+  },
+  "adv_adj": {
+    "bardzo dobry": {
+      "type": "adv_adj",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.75, "entropy": 0.25}
+    },
+    "naprawdę trudny": {
+      "type": "adv_adj",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "całkowicie inny": {
+      "type": "adv_adj",
+      "frequency": "medium",
+      "gtmo_coords": {"determination": 0.7, "stability": 0.65, "entropy": 0.35}
+    }
+  },
+  "idioms": {
+    "brać się w garść": {
+      "type": "idiom",
+      "frequency": "medium",
+      "meaning": "mobilizować się",
+      "gtmo_coords": {"determination": 0.5, "stability": 0.4, "entropy": 0.6}
+    },
+    "wziąć nogi za pas": {
+      "type": "idiom",
+      "frequency": "low",
+      "meaning": "uciec",
+      "gtmo_coords": {"determination": 0.4, "stability": 0.3, "entropy": 0.7}
+    },
+    "rzucać się w oczy": {
+      "type": "idiom",
+      "frequency": "medium",
+      "meaning": "być widocznym",
+      "gtmo_coords": {"determination": 0.6, "stability": 0.5, "entropy": 0.5}
+    },
+    "pójść w ślady": {
+      "type": "idiom",
+      "frequency": "medium",
+      "meaning": "naśladować",
+      "gtmo_coords": {"determination": 0.65, "stability": 0.55, "entropy": 0.45}
+    },
+    "złamać serce": {
+      "type": "idiom",
+      "frequency": "high",
+      "meaning": "skrzywdzić emocjonalnie",
+      "gtmo_coords": {"determination": 0.5, "stability": 0.4, "entropy": 0.6}
+    }
+  },
+  "prep_noun": {
+    "w domu": {
+      "type": "prep_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.85, "stability": 0.85, "entropy": 0.15}
+    },
+    "na pewno": {
+      "type": "prep_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.9, "stability": 0.85, "entropy": 0.1}
+    },
+    "z powodu": {
+      "type": "prep_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.75, "entropy": 0.25}
+    },
+    "w końcu": {
+      "type": "prep_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "od razu": {
+      "type": "prep_noun",
+      "frequency": "high",
+      "gtmo_coords": {"determination": 0.8, "stability": 0.75, "entropy": 0.25}
+    }
+  }
+}

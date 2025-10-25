@@ -1,0 +1,39 @@
+{
+  "semantic_clusters": {
+    "emocje_pozytywne": {
+      "words": ["radość", "szczęście", "wesołość", "zadowolenie", "uśmiech"],
+      "gtmo_coords": {"determination": 0.7, "stability": 0.65, "entropy": 0.35}
+    },
+    "emocje_negatywne": {
+      "words": ["smutek", "żal", "rozpacz", "ból", "cierpienie"],
+      "gtmo_coords": {"determination": 0.6, "stability": 0.5, "entropy": 0.5}
+    },
+    "wiedza": {
+      "words": ["nauka", "edukacja", "wiedza", "poznanie", "uczenie"],
+      "gtmo_coords": {"determination": 0.85, "stability": 0.8, "entropy": 0.2}
+    },
+    "działanie": {
+      "words": ["robić", "czynić", "działać", "wykonywać", "tworzyć"],
+      "gtmo_coords": {"determination": 0.75, "stability": 0.7, "entropy": 0.3}
+    },
+    "myślenie": {
+      "words": ["myśleć", "rozważać", "analizować", "przemyśleć", "zastanawiać"],
+      "gtmo_coords": {"determination": 0.6, "stability": 0.55, "entropy": 0.45}
+    },
+    "czas_przeszły": {
+      "words": ["był", "miał", "robił", "szedł", "mówił"],
+      "gtmo_coords": {"determination": 0.7, "stability": 0.8, "entropy": 0.2}
+    },
+    "czas_przyszły": {
+      "words": ["będzie", "zrobi", "pójdzie", "powie", "stanie"],
+      "gtmo_coords": {"determination": 0.4, "stability": 0.3, "entropy": 0.6}
+    }
+  },
+  "word_similarities": {
+    "dom": ["mieszkanie", "budynek", "kamienica", "willa"],
+    "pies": ["kot", "zwierzę", "pupil", "czworonóg"],
+    "książka": ["tom", "publikacja", "dzieło", "lektura"],
+    "szybki": ["prędki", "błyskawiczny", "raptowny", "wartki"],
+    "piękny": ["ładny", "śliczny", "przepiękny", "cudowny"]
+  }
+}
